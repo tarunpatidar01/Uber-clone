@@ -52,18 +52,19 @@ function getOtp(num) {
 }
 
 
-module.exports.createRide = async ({ user, pickup, destination, vehicleType }) => {
+module.exports.createRide = async ({ userId, pickup, destination, vehicleType }) => {
     // Log the input parameters
     // console.log('Create Ride Params:', { user, pickup, destination, vehicleType });
+    // console.log(userId);
 
-    if (!user || !pickup || !destination || !vehicleType) {
+    if (!userId || !pickup || !destination || !vehicleType) {
         throw new Error('All fields are required');
     }
 
     const fare = await getFare(pickup, destination);
     
     const ride = rideModel.create({
-        user: user._id,
+        user: userId,
         pickup,
         destination,
         otp: getOtp(6),
