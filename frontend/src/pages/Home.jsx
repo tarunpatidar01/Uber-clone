@@ -27,6 +27,8 @@ const Home = () => {
     const [ confirmRidePanel, setConfirmRidePanel ] = useState(false)
     const [ vehicleFound, setVehicleFound ] = useState(false)
     const [ waitingForDriver, setWaitingForDriver ] = useState(false)
+    const [ LookingForDriverPanel, setLookingForDriverPanel ] = useState(false)
+    const LookingForDriverPanelRef = useRef(null)
     const [ pickupSuggestions, setPickupSuggestions ] = useState([])
     const [ destinationSuggestions, setDestinationSuggestions ] = useState([])
     const [ activeField, setActiveField ] = useState(null)
@@ -36,10 +38,10 @@ const Home = () => {
     const {socket} = useContext(SocketContext);
     const {user} = useContext(UserDataContext);
 
-// useEffect(() => {
-//     console.log(user);
-//     socket.emit("join",{userType: "user", userId: user._id})
-//    },[user]);
+useEffect(() => {
+   
+    socket.emit("join",{userType: "user", userId: user._id});
+   },[user]);
      
     const handlePickupChange = async (e) => {
         setPickup(e.target.value)
@@ -134,11 +136,12 @@ const Home = () => {
             })
         }
     }, [ vehicleFound ])
+    
 
     useGSAP(function () {
         if (waitingForDriver) {
             gsap.to(waitingForDriverRef.current, {
-                transform: 'translateY(10%)'
+                transform: 'translateY(20%)'
             })
         } else {
             gsap.to(waitingForDriverRef.current, {
@@ -253,6 +256,7 @@ const Home = () => {
             </div>
             <div ref={vehicleFoundRef} className='fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-6 pt-12'>
                 <LookingForDriver
+                    ref={LookingForDriverPanelRef}
                     createRide={createRide}
                     pickup={pickup}
                     destination={destination}

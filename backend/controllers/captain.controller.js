@@ -65,8 +65,7 @@ module.exports.loginCaptain = async (req,res,next) =>{
 }
 
 module.exports.getUserProfile = async (req,res,next) =>{
-    res.send("profile");
-    res.status(200).json(req.user);
+    res.status(200).json(req.captain);
 }
 
 module.exports.logoutCaptain = async (req,res,next) => {

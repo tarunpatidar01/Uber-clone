@@ -21,6 +21,7 @@ const VehiclePanel = (props) => {
             </div>
             <div onClick={() => {
                 props.setConfirmRidePanel(true)
+                props.
                 props.selectVehicle('moto')
             }} className='flex border-2 active:border-black mb-2 rounded-xl w-full p-3  items-center justify-between'>
                 <img className='h-10' src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,h_638,w_956/v1649231091/assets/2c/7fa194-c954-49b2-9c6d-a3b8601370f5/original/Uber_Moto_Orange_312x208_pixels_Mobile.png" alt="" />

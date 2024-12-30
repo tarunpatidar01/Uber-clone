@@ -15,10 +15,10 @@ module.exports.createRide = async (req, res) => {
     // Log the request body
     // console.log('Request Body:', req.body);
     // console.log(user);
-    
 
     try {
         const ride = await rideService.createRide({ userId: user._id, pickup, destination, vehicleType });
+        
         res.status(201).json(ride);
     } catch (err) {
         console.log(err);
