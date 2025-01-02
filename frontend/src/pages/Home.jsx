@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import axios from 'axios';
@@ -9,9 +9,10 @@ import ConfirmRide from '../components/ConfirmRide';
 import LookingForDriver from '../components/LokingForDriver';
 import WaitingForDriver from '../components/WaitingForDriver';
 import { SocketContext } from '../context/SocketContext';
-import { useEffect } from 'react';
-import { UserDataContext } from '../context/userContext';
-
+import { useContext } from 'react';
+import { UserDataContext } from '../context/UserContext';
+import { useNavigate } from 'react-router-dom';
+// import LiveTracking from '../components/LiveTracking';
 
 const Home = () => {
     const [ pickup, setPickup ] = useState('')
@@ -27,22 +28,37 @@ const Home = () => {
     const [ confirmRidePanel, setConfirmRidePanel ] = useState(false)
     const [ vehicleFound, setVehicleFound ] = useState(false)
     const [ waitingForDriver, setWaitingForDriver ] = useState(false)
-    const [ LookingForDriverPanel, setLookingForDriverPanel ] = useState(false)
-    const LookingForDriverPanelRef = useRef(null)
     const [ pickupSuggestions, setPickupSuggestions ] = useState([])
     const [ destinationSuggestions, setDestinationSuggestions ] = useState([])
     const [ activeField, setActiveField ] = useState(null)
     const [ fare, setFare ] = useState({})
     const [ vehicleType, setVehicleType ] = useState(null)
+    const [ ride, setRide ] = useState(null)
 
-    const {socket} = useContext(SocketContext);
-    const {user} = useContext(UserDataContext);
+    const navigate = useNavigate()
 
-useEffect(() => {
-   
-    socket.emit("join",{userType: "user", userId: user._id});
-   },[user]);
-     
+    const { socket } = useContext(SocketContext)
+    const { user } = useContext(UserDataContext)
+
+    useEffect(() => {
+        socket.emit("join", { userType: "user", userId: user._id })
+    }, [ user ])
+
+    socket.on('ride-confirmed', ride => {
+
+
+        setVehicleFound(false)
+        setWaitingForDriver(true)
+        setRide(ride)
+    })
+
+    socket.on('ride-started', ride => {
+        console.log("ride")
+        setWaitingForDriver(false)
+        navigate('/riding', { state: { ride } }) // Updated navigate to include ride data
+    })
+
+
     const handlePickupChange = async (e) => {
         setPickup(e.target.value)
         try {
@@ -136,12 +152,11 @@ useEffect(() => {
             })
         }
     }, [ vehicleFound ])
-    
 
     useGSAP(function () {
         if (waitingForDriver) {
             gsap.to(waitingForDriverRef.current, {
-                transform: 'translateY(20%)'
+                transform: 'translateY(0)'
             })
         } else {
             gsap.to(waitingForDriverRef.current, {
@@ -162,7 +177,7 @@ useEffect(() => {
             }
         })
 
-        console.log(response.data)
+
         setFare(response.data)
 
 
@@ -179,7 +194,7 @@ useEffect(() => {
             }
         })
 
-        console.log(response.data)
+
     }
 
     return (
@@ -187,7 +202,7 @@ useEffect(() => {
             <img className='w-16 absolute left-5 top-5' src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png" alt="" />
             <div className='h-screen w-screen'>
                 {/* image for temporary use  */}
-                <img className='h-full w-full object-cover' src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif" alt="" />
+                {/* <LiveTracking /> */}
             </div>
             <div className=' flex flex-col justify-end h-screen absolute top-0 w-full'>
                 <div className='h-[30%] p-6 bg-white relative'>
@@ -252,11 +267,11 @@ useEffect(() => {
                     destination={destination}
                     fare={fare}
                     vehicleType={vehicleType}
+
                     setConfirmRidePanel={setConfirmRidePanel} setVehicleFound={setVehicleFound} />
             </div>
             <div ref={vehicleFoundRef} className='fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-6 pt-12'>
                 <LookingForDriver
-                    ref={LookingForDriverPanelRef}
                     createRide={createRide}
                     pickup={pickup}
                     destination={destination}
@@ -265,7 +280,11 @@ useEffect(() => {
                     setVehicleFound={setVehicleFound} />
             </div>
             <div ref={waitingForDriverRef} className='fixed w-full  z-10 bottom-0  bg-white px-3 py-6 pt-12'>
-                <WaitingForDriver waitingForDriver={waitingForDriver} />
+                <WaitingForDriver
+                    ride={ride}
+                    setVehicleFound={setVehicleFound}
+                    setWaitingForDriver={setWaitingForDriver}
+                    waitingForDriver={waitingForDriver} />
             </div>
         </div>
     )

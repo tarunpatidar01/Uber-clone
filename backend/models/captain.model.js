@@ -54,16 +54,20 @@ const captainSchema = new mongoose.Schema({
             type: String,
             required: true,
             enum: ['car','motorcycle','auto']
-        },
+        }
+    },
         location:{
             ltd:{
-                type: Number
+                type: Number,
+                default: 0.00
+
             },
             lng:{
-                type: Number
+                type: Number,
+                default: 0.00
             }
         }
-    }
+    
 })
 
 captainSchema.methods.generateAuthToken = function () {

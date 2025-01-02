@@ -33,7 +33,7 @@ const ConfirmRide = (props) => {
                         </div>
                     </div>
                 </div>
-                <button onClick={() => {
+                <button onClick={() => {    
                     props.setVehicleFound(true)
                     props.setConfirmRidePanel(false)
                     props.createRide()
